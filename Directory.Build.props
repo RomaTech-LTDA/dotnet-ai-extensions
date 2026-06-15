@@ -11,8 +11,31 @@
     <Company>Romatech</Company>
     <RepositoryUrl>https://github.com/romatech-ltda/ai-extensions</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>    
     <PackageProjectUrl>https://github.com/romatech-ltda/ai-extensions</PackageProjectUrl>
     <Copyright>Copyright (c) Romatech 2024</Copyright>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageTags>
+      ai;
+      llm;
+      rag;
+      mcp;
+      swagger;
+      openapi;
+      aspnetcore;
+      semantic-search;
+      ai-tools
+    </PackageTags>
+    <Description>
+      Plug-and-play AI enablement framework for ASP.NET Core applications with MCP and RAG support.
+    </Description>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\" />
+    <None Include="$(MSBuildThisFileDirectory)logo.png" Pack="true" PackagePath="icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
+  </ItemGroup>
 </Project>
