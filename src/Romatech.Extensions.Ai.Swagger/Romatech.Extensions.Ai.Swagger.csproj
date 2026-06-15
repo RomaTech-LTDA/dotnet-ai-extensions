@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Romatech.Extensions.Ai.Swagger</PackageId>
+    <Description>Swagger/OpenAPI discovery and schema conversion for Romatech.Extensions.Ai</Description>
+    <PackageTags>ai;mcp;rag;aspnetcore;swagger;openapi</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.OpenApi.Readers" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Romatech.Extensions.Ai.Shared\Romatech.Extensions.Ai.Shared.csproj" />
+    <ProjectReference Include="..\Romatech.Extensions.Ai.Metadata\Romatech.Extensions.Ai.Metadata.csproj" />
+  </ItemGroup>
+
+</Project>
