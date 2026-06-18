@@ -34,4 +34,13 @@ public sealed class McpOptions
     /// Whether to require authentication for MCP calls. Default: false (inherits host auth).
     /// </summary>
     public bool RequireAuthentication { get; set; } = false;
+
+    /// <summary>
+    /// Base URL for internal HTTP calls when executing tools.
+    /// Default: http://localhost:5000 (auto-detected from Kestrel if possible).
+    /// WARNING: The executor calls back into the same application via HTTP.
+    /// Under heavy load this may cause thread pool starvation.
+    /// Consider increasing ThreadPool.SetMinThreads() for high-traffic apps.
+    /// </summary>
+    public string BaseUrl { get; set; } = "http://localhost:5000";
 }

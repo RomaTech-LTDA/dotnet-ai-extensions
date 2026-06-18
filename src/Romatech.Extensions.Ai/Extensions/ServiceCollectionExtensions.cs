@@ -39,13 +39,21 @@ public static class ServiceCollectionExtensions
     /// <returns>The service collection for chaining.</returns>
     public static IServiceCollection UseMcp(this IServiceCollection services, Action<McpOptions> configure)
     {
+        var mcpOptions = new McpOptions();
+        configure(mcpOptions);
         services.Configure(configure);
         services.Configure<SwaggerDiscoveryOptions>(_ => { });
 
         // Core services
         services.AddMemoryCache();
-        services.AddHttpClient("RomatechAiSwagger");
-        services.AddHttpClient("RomatechAiMcpInternal");
+        services.AddHttpClient("RomatechAiSwagger", client =>
+        {
+            client.BaseAddress = new Uri(mcpOptions.BaseUrl);
+        });
+        services.AddHttpClient("RomatechAiMcpInternal", client =>
+        {
+            client.BaseAddress = new Uri(mcpOptions.BaseUrl);
+        });
 
         // Register Swagger operation filter so AI metadata flows into the OpenAPI document
         services.ConfigureSwaggerGen(options =>
