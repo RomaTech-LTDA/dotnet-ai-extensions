@@ -5,7 +5,7 @@
 
 A plug-and-play AI enablement framework for ASP.NET Core applications. Transforms existing APIs into MCP-compatible tool providers, AI-readable semantic documentation, and RAG-enabled knowledge sources — without architectural rewrites.
 
-> **Node.js version?** See [@romatech/ai-extensions](https://github.com/RomaTech-LTDA/ai-extensions-node) for the equivalent framework in Node.js.
+> **Node.js version?** See [@romatech/ai-extensions](https://github.com/RomaTech-LTDA/ai-extensions) for the equivalent framework in Node.js.
 
 ## Installation
 
