@@ -10,10 +10,10 @@
     <NoWarn>$(NoWarn);NETSDK1138</NoWarn>
     <Authors>Romatech</Authors>
     <Company>Romatech</Company>
-    <RepositoryUrl>https://github.com/romatech-ltda/dotnet-ai-extensions</RepositoryUrl>
+    <RepositoryUrl>https://github.com/RomaTech-LTDA/dotnet-ai-extensions</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>    
-    <PackageProjectUrl>https://github.com/romatech-ltda/dotnet-ai-extensions</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/RomaTech-LTDA/dotnet-ai-extensions</PackageProjectUrl>
     <Copyright>Copyright (c) Romatech 2024</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>icon.png</PackageIcon>

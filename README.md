@@ -1,6 +1,11 @@
 # Romatech.Extensions.Ai
 
+[![NuGet](https://img.shields.io/nuget/v/Romatech.Extensions.Ai)](https://www.nuget.org/packages/Romatech.Extensions.Ai)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/RomaTech-LTDA/dotnet-ai-extensions/blob/main/LICENSE)
+
 A plug-and-play AI enablement framework for ASP.NET Core applications. Transforms existing APIs into MCP-compatible tool providers, AI-readable semantic documentation, and RAG-enabled knowledge sources — without architectural rewrites.
+
+> **Node.js version?** See [@romatech/ai-extensions](https://github.com/RomaTech-LTDA/ai-extensions-node) for the equivalent framework in Node.js.
 
 ## Installation
 
@@ -190,8 +195,6 @@ benchmarks/
 
 ## Supported .NET Versions
 
-- .NET 6.0
-- .NET 7.0
 - .NET 8.0
 - .NET 9.0
 
@@ -208,4 +211,4 @@ Check that endpoints have descriptions and are not marked `[AiHidden]`.
 
 ## License
 
-MIT
+[MIT](https://github.com/RomaTech-LTDA/dotnet-ai-extensions/blob/main/LICENSE)
