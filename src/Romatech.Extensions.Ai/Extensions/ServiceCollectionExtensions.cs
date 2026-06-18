@@ -11,6 +11,7 @@ using Romatech.Extensions.Ai.Rag.Services;
 using Romatech.Extensions.Ai.Shared.Abstractions;
 using Romatech.Extensions.Ai.Swagger.Configuration;
 using Romatech.Extensions.Ai.Swagger.Discovery;
+using Romatech.Extensions.Ai.Swagger.Filters;
 
 namespace Romatech.Extensions.Ai.Extensions;
 
@@ -45,6 +46,12 @@ public static class ServiceCollectionExtensions
         services.AddMemoryCache();
         services.AddHttpClient("RomatechAiSwagger");
         services.AddHttpClient("RomatechAiMcpInternal");
+
+        // Register Swagger operation filter so AI metadata flows into the OpenAPI document
+        services.ConfigureSwaggerGen(options =>
+        {
+            options.OperationFilter<AiMetadataOperationFilter>();
+        });
 
         // Discovery
         services.TryAddSingleton<IEndpointDiscoveryProvider, SwaggerEndpointDiscoveryProvider>();

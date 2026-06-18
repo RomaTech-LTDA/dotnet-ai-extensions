@@ -1,5 +1,6 @@
 <Project>
   <PropertyGroup>
+    <Version>1.0.1</Version>
     <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
@@ -9,10 +10,10 @@
     <NoWarn>$(NoWarn);NETSDK1138</NoWarn>
     <Authors>Romatech</Authors>
     <Company>Romatech</Company>
-    <RepositoryUrl>https://github.com/romatech-ltda/ai-extensions</RepositoryUrl>
+    <RepositoryUrl>https://github.com/romatech-ltda/dotnet-ai-extensions</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>    
-    <PackageProjectUrl>https://github.com/romatech-ltda/ai-extensions</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/romatech-ltda/dotnet-ai-extensions</PackageProjectUrl>
     <Copyright>Copyright (c) Romatech 2024</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>icon.png</PackageIcon>

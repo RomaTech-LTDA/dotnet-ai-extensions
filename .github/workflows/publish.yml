@@ -1,0 +1,62 @@
+name: Publish to NuGet
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump minor version
+        run: |
+          CURRENT=$(grep -oP '(?<=<Version>)[^<]+' Directory.Build.props || echo "1.0.0")
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+          NEW_VERSION="$MAJOR.$((MINOR + 1)).0"
+          if grep -q '<Version>' Directory.Build.props; then
+            sed -i "s|<Version>.*</Version>|<Version>$NEW_VERSION</Version>|" Directory.Build.props
+          else
+            sed -i "s|<PropertyGroup>|<PropertyGroup>\n    <Version>$NEW_VERSION</Version>|" Directory.Build.props
+          fi
+          echo "VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Run tests
+        run: dotnet test --configuration Release --no-build --verbosity normal
+
+      - name: Pack
+        run: dotnet pack --configuration Release --no-build --output ./nupkgs
+
+      - name: Publish to NuGet
+        run: dotnet nuget push ./nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+      - name: Commit and push version bump
+        run: |
+          git add Directory.Build.props
+          git commit -m "chore: bump version to ${{ env.VERSION }}"
+          git push

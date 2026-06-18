@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Romatech.Extensions.Ai.Mcp.Configuration;
@@ -49,6 +50,10 @@ public sealed class McpMiddleware
             context.Response.StatusCode = 405;
             return;
         }
+
+        // Ensure registry is initialized on first MCP request
+        var registry = context.RequestServices.GetRequiredService<McpToolRegistry>();
+        await registry.InitializeAsync(context.RequestAborted);
 
         McpRequest? request;
         try
