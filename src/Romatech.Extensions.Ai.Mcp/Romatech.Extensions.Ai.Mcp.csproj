@@ -21,6 +21,7 @@
     <ProjectReference Include="..\Romatech.Extensions.Ai.Shared\Romatech.Extensions.Ai.Shared.csproj" />
     <ProjectReference Include="..\Romatech.Extensions.Ai.Metadata\Romatech.Extensions.Ai.Metadata.csproj" />
     <ProjectReference Include="..\Romatech.Extensions.Ai.Swagger\Romatech.Extensions.Ai.Swagger.csproj" />
+    <ProjectReference Include="..\Romatech.Extensions.Ai.Rag\Romatech.Extensions.Ai.Rag.csproj" />
   </ItemGroup>
 
 </Project>
