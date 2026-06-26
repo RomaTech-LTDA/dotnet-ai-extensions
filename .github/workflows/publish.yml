@@ -3,12 +3,10 @@ name: Publish to NuGet
 on:
   push:
     branches: ["main"]
-    paths-ignore:
-      - '*.md'
-      - 'index.html'
-      - 'logo.png'
-      - 'docs/**'
-      - '.github/ISSUE_TEMPLATE/**'
+    paths:
+      - 'src/**'
+      - 'Directory.Build.props'
+      - 'Directory.Packages.props'
   workflow_dispatch:
 
 concurrency:
@@ -17,90 +15,38 @@ concurrency:
 
 jobs:
   publish:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
+      - uses: actions/checkout@v4
 
-      - name: Check if publishable changes
-        id: check
-        run: |
-          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-          if [ -z "$LAST_TAG" ]; then
-            echo "publish=true" >> $GITHUB_OUTPUT
-          else
-            CHANGES=$(git diff --name-only "$LAST_TAG"..HEAD -- src/ Directory.Build.props Directory.Packages.props 2>/dev/null | wc -l)
-            if [ "$CHANGES" -gt 0 ]; then
-              echo "publish=true" >> $GITHUB_OUTPUT
-            else
-              echo "publish=false" >> $GITHUB_OUTPUT
-              echo "No publishable changes since $LAST_TAG"
-            fi
-          fi
-
-      - name: Setup .NET
-        if: steps.check.outputs.publish == 'true'
-        uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
             8.0.x
             9.0.x
 
-      - name: Configure git
-        if: steps.check.outputs.publish == 'true'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Bump version
-        if: steps.check.outputs.publish == 'true'
-        id: version
-        run: |
-          CURRENT=$(grep -oP '(?<=<Version>)[^<]+' Directory.Build.props || echo "1.0.0")
-          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
-          NEW_VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
-          sed -i "s|<Version>.*</Version>|<Version>$NEW_VERSION</Version>|" Directory.Build.props
-          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
-          echo "New version: $NEW_VERSION"
-
-      - name: Restore
-        if: steps.check.outputs.publish == 'true'
-        run: dotnet restore
-
-      - name: Build
-        if: steps.check.outputs.publish == 'true'
-        run: dotnet build --configuration Release --no-restore
-
-      - name: Test
-        if: steps.check.outputs.publish == 'true'
-        run: dotnet test --configuration Release --no-build --verbosity normal
-
-      - name: Pack
-        if: steps.check.outputs.publish == 'true'
-        run: dotnet pack --configuration Release --no-build --output ./nupkgs
+      - run: dotnet restore
+      - run: dotnet build --configuration Release --no-restore
+      - run: dotnet test --configuration Release --no-build --verbosity normal
+      - run: dotnet pack --configuration Release --no-build --output ./nupkgs
 
       - name: Publish to NuGet
-        if: steps.check.outputs.publish == 'true'
         run: dotnet nuget push ./nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
 
-      - name: Commit, tag, and push
-        if: steps.check.outputs.publish == 'true'
+      - name: Tag + Release
         run: |
-          git add -A
-          git commit -m "chore: release v${{ steps.version.outputs.version }} [skip ci]"
-          git tag "v${{ steps.version.outputs.version }}"
-          git push
-          git push --tags
+          VERSION=$(grep -oP '(?<=<Version>)[^<]+' Directory.Build.props)
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "v$VERSION" 2>/dev/null || true
+          git push --tags 2>/dev/null || true
 
-      - name: Create GitHub Release
-        if: steps.check.outputs.publish == 'true'
+      - name: GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ steps.version.outputs.version }}
-          name: v${{ steps.version.outputs.version }}
+          tag_name: v2.0.0
+          name: v2.0.0
           generate_release_notes: true
