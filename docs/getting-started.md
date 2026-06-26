@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- .NET 8.0 or later
+- .NET 8.0 or .NET 9.0
 - An ASP.NET Core application with Swagger/OpenAPI enabled
 
 ## Installation
