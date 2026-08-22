@@ -12,29 +12,34 @@ using Romatech.Extensions.Ai.Swagger.Schema;
 namespace Romatech.Extensions.Ai.Swagger.Discovery;
 
 /// <summary>
-/// Discovers endpoints by reading the application's Swagger/OpenAPI specification.
+/// Discovers endpoints by reading the application's OpenAPI specification.
+/// Works with any OpenAPI document source (Swashbuckle, Microsoft.AspNetCore.OpenApi, Scalar, etc.).
+/// Uses <see cref="OpenApiDocumentResolver"/> to auto-detect the correct endpoint.
 /// </summary>
-public sealed class SwaggerEndpointDiscoveryProvider : IEndpointDiscoveryProvider
+public sealed class OpenApiEndpointDiscoveryProvider : IEndpointDiscoveryProvider
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IMemoryCache _cache;
-    private readonly SwaggerDiscoveryOptions _options;
-    private readonly ILogger<SwaggerEndpointDiscoveryProvider> _logger;
+    private readonly OpenApiDiscoveryOptions _options;
+    private readonly OpenApiDocumentResolver _resolver;
+    private readonly ILogger<OpenApiEndpointDiscoveryProvider> _logger;
 
-    private const string CacheKey = "Romatech.Ai.Swagger.Endpoints";
+    private const string CacheKey = "Romatech.Ai.OpenApi.Endpoints";
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SwaggerEndpointDiscoveryProvider"/> class.
+    /// Initializes a new instance of the <see cref="OpenApiEndpointDiscoveryProvider"/> class.
     /// </summary>
-    public SwaggerEndpointDiscoveryProvider(
+    public OpenApiEndpointDiscoveryProvider(
         IHttpClientFactory httpClientFactory,
         IMemoryCache cache,
-        IOptions<SwaggerDiscoveryOptions> options,
-        ILogger<SwaggerEndpointDiscoveryProvider> logger)
+        IOptions<OpenApiDiscoveryOptions> options,
+        OpenApiDocumentResolver resolver,
+        ILogger<OpenApiEndpointDiscoveryProvider> logger)
     {
         _httpClientFactory = httpClientFactory;
         _cache = cache;
         _options = options.Value;
+        _resolver = resolver;
         _logger = logger;
     }
 
@@ -47,7 +52,7 @@ public sealed class SwaggerEndpointDiscoveryProvider : IEndpointDiscoveryProvide
             return cached;
         }
 
-        var endpoints = await DiscoverFromSwaggerAsync(cancellationToken);
+        var endpoints = await DiscoverFromOpenApiAsync(cancellationToken);
 
         if (_options.EnableCaching)
         {
@@ -59,12 +64,14 @@ public sealed class SwaggerEndpointDiscoveryProvider : IEndpointDiscoveryProvide
         return endpoints;
     }
 
-    private async Task<IReadOnlyList<AiEndpointDescriptor>> DiscoverFromSwaggerAsync(CancellationToken cancellationToken)
+    private async Task<IReadOnlyList<AiEndpointDescriptor>> DiscoverFromOpenApiAsync(CancellationToken cancellationToken)
     {
+        var endpoint = _resolver.ResolveEndpoint(_options.ManualEndpoint);
+
         try
         {
-            var client = _httpClientFactory.CreateClient("RomatechAiSwagger");
-            var response = await client.GetAsync(_options.SwaggerEndpoint, cancellationToken);
+            var client = _httpClientFactory.CreateClient("RomatechAiOpenApi");
+            var response = await client.GetAsync(endpoint, cancellationToken);
             response.EnsureSuccessStatusCode();
 
             var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
@@ -80,7 +87,7 @@ public sealed class SwaggerEndpointDiscoveryProvider : IEndpointDiscoveryProvide
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to discover endpoints from Swagger at {Endpoint}", _options.SwaggerEndpoint);
+            _logger.LogError(ex, "Failed to discover endpoints from OpenAPI at {Endpoint}", endpoint);
             return Array.Empty<AiEndpointDescriptor>();
         }
     }

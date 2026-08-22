@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Romatech.Extensions.Ai.Mcp.Configuration;
-using Romatech.Extensions.Ai.Mcp.Middleware;
 using Romatech.Extensions.Ai.Mcp.Security;
 using Romatech.Extensions.Ai.Mcp.Services;
 using Romatech.Extensions.Ai.Rag.Configuration;
@@ -11,7 +10,6 @@ using Romatech.Extensions.Ai.Rag.Services;
 using Romatech.Extensions.Ai.Shared.Abstractions;
 using Romatech.Extensions.Ai.Swagger.Configuration;
 using Romatech.Extensions.Ai.Swagger.Discovery;
-using Romatech.Extensions.Ai.Swagger.Filters;
 
 namespace Romatech.Extensions.Ai.Extensions;
 
@@ -22,7 +20,8 @@ public static class ServiceCollectionExtensions
 {
     /// <summary>
     /// Adds MCP (Model Context Protocol) support to the application.
-    /// Automatically discovers endpoints and exposes them as MCP tools.
+    /// Automatically discovers endpoints from the application's OpenAPI document and exposes them as MCP tools.
+    /// Supports auto-detection of Swashbuckle, Microsoft.AspNetCore.OpenApi, and Scalar.
     /// </summary>
     /// <param name="services">The service collection.</param>
     /// <returns>The service collection for chaining.</returns>
@@ -42,11 +41,19 @@ public static class ServiceCollectionExtensions
         var mcpOptions = new McpOptions();
         configure(mcpOptions);
         services.Configure(configure);
-        services.Configure<SwaggerDiscoveryOptions>(_ => { });
+
+        // Configure OpenAPI discovery options, propagating manual endpoint if set
+        services.Configure<OpenApiDiscoveryOptions>(opts =>
+        {
+            if (!string.IsNullOrWhiteSpace(mcpOptions.OpenApiEndpoint))
+            {
+                opts.ManualEndpoint = mcpOptions.OpenApiEndpoint;
+            }
+        });
 
         // Core services
         services.AddMemoryCache();
-        services.AddHttpClient("RomatechAiSwagger", client =>
+        services.AddHttpClient("RomatechAiOpenApi", client =>
         {
             client.BaseAddress = new Uri(mcpOptions.BaseUrl);
         });
@@ -55,14 +62,11 @@ public static class ServiceCollectionExtensions
             client.BaseAddress = new Uri(mcpOptions.BaseUrl);
         });
 
-        // Register Swagger operation filter so AI metadata flows into the OpenAPI document
-        services.ConfigureSwaggerGen(options =>
-        {
-            options.OperationFilter<AiMetadataOperationFilter>();
-        });
+        // OpenAPI document resolver (auto-detects Swagger/Scalar/MS OpenApi)
+        services.TryAddSingleton<OpenApiDocumentResolver>();
 
         // Discovery
-        services.TryAddSingleton<IEndpointDiscoveryProvider, SwaggerEndpointDiscoveryProvider>();
+        services.TryAddSingleton<IEndpointDiscoveryProvider, OpenApiEndpointDiscoveryProvider>();
 
         // MCP services
         services.TryAddSingleton<McpToolRegistry>();
@@ -75,7 +79,7 @@ public static class ServiceCollectionExtensions
 
     /// <summary>
     /// Adds RAG (Retrieval Augmented Generation) support to the application.
-    /// Automatically indexes endpoints for semantic search.
+    /// Automatically indexes endpoints for semantic search using the same OpenAPI document.
     /// </summary>
     /// <param name="services">The service collection.</param>
     /// <returns>The service collection for chaining.</returns>
@@ -93,14 +97,17 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection UseRag(this IServiceCollection services, Action<RagOptions> configure)
     {
         services.Configure(configure);
-        services.Configure<SwaggerDiscoveryOptions>(_ => { });
+        services.Configure<OpenApiDiscoveryOptions>(_ => { });
 
         // Core services
         services.AddMemoryCache();
-        services.AddHttpClient("RomatechAiSwagger");
+        services.AddHttpClient("RomatechAiOpenApi");
+
+        // OpenAPI document resolver
+        services.TryAddSingleton<OpenApiDocumentResolver>();
 
         // Discovery
-        services.TryAddSingleton<IEndpointDiscoveryProvider, SwaggerEndpointDiscoveryProvider>();
+        services.TryAddSingleton<IEndpointDiscoveryProvider, OpenApiEndpointDiscoveryProvider>();
 
         // RAG services
         services.TryAddSingleton<IEmbeddingProvider, LocalEmbeddingProvider>();

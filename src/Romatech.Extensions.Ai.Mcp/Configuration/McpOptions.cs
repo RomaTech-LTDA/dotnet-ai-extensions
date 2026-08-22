@@ -43,4 +43,12 @@ public sealed class McpOptions
     /// Consider increasing ThreadPool.SetMinThreads() for high-traffic apps.
     /// </summary>
     public string BaseUrl { get; set; } = "http://localhost:5000";
+
+    /// <summary>
+    /// Manual override for the OpenAPI document endpoint.
+    /// When set, skips auto-detection and uses this endpoint directly.
+    /// Examples: "/swagger/v1/swagger.json", "/openapi/v1.json", "https://api.example.com/openapi.json"
+    /// Default: null (auto-detect from registered services).
+    /// </summary>
+    public string? OpenApiEndpoint { get; set; }
 }

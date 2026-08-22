@@ -8,17 +8,17 @@ public sealed class SemanticDocument
     /// <summary>
     /// Unique identifier for this document.
     /// </summary>
-    public required string Id { get; init; }
+    public string Id { get; init; } = default!;
 
     /// <summary>
     /// The text content of the document used for embedding.
     /// </summary>
-    public required string Content { get; init; }
+    public string Content { get; init; } = default!;
 
     /// <summary>
     /// The source endpoint tool name.
     /// </summary>
-    public required string ToolName { get; init; }
+    public string ToolName { get; init; } = default!;
 
     /// <summary>
     /// HTTP method of the source endpoint.

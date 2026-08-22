@@ -8,7 +8,7 @@ public sealed class SearchResult
     /// <summary>
     /// The matched document.
     /// </summary>
-    public required SemanticDocument Document { get; init; }
+    public SemanticDocument Document { get; init; } = default!;
 
     /// <summary>
     /// Cosine similarity score (0.0 to 1.0).

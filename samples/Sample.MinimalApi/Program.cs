@@ -3,22 +3,30 @@ using Romatech.Extensions.Ai.Metadata.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// The user configures their own OpenAPI generator (Swashbuckle, Scalar, MS OpenApi, etc.)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // AI enablement — zero boilerplate
+// The lib auto-detects the OpenAPI endpoint from registered services
 builder.Services.UseMcp(options =>
 {
     options.Route = "/mcp";
     options.EnableRateLimiting = true;
+    // Optional: manually specify endpoint if auto-detection doesn't work
+    // options.OpenApiEndpoint = "/swagger/v1/swagger.json";
 });
 builder.Services.UseRag();
 
 var app = builder.Build();
 
+// The user manages their own API documentation UI
 app.UseSwagger();
 app.UseSwaggerUI();
+
+// AI middleware — only adds MCP/RAG capabilities, no UI rendering
 app.UseMcp();
+app.UseRag();
 
 // Minimal API endpoints with AI metadata
 app.MapGet("/api/products", () =>

@@ -8,17 +8,17 @@ public sealed class AiEndpointDescriptor
     /// <summary>
     /// The tool name used for MCP registration.
     /// </summary>
-    public required string ToolName { get; init; }
+    public string ToolName { get; init; } = default!;
 
     /// <summary>
     /// HTTP method (GET, POST, PUT, DELETE, etc.).
     /// </summary>
-    public required string HttpMethod { get; init; }
+    public string HttpMethod { get; init; } = default!;
 
     /// <summary>
     /// The route template for this endpoint.
     /// </summary>
-    public required string Route { get; init; }
+    public string Route { get; init; } = default!;
 
     /// <summary>
     /// Human-readable description for AI consumers.

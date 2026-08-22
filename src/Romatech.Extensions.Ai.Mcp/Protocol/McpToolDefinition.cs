@@ -8,7 +8,7 @@ namespace Romatech.Extensions.Ai.Mcp.Protocol;
 public sealed class McpToolDefinition
 {
     [JsonPropertyName("name")]
-    public required string Name { get; init; }
+    public string Name { get; init; } = default!;
 
     [JsonPropertyName("description")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
