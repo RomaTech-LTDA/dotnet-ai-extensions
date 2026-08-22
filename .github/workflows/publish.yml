@@ -25,8 +25,11 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
+            6.0.x
+            7.0.x
             8.0.x
             9.0.x
+            10.0.x
 
       - run: dotnet restore
       - run: dotnet build --configuration Release --no-restore
@@ -39,6 +42,7 @@ jobs:
       - name: Tag + Release
         run: |
           VERSION=$(grep -oP '(?<=<Version>)[^<]+' Directory.Build.props)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag "v$VERSION" 2>/dev/null || true
@@ -47,6 +51,6 @@ jobs:
       - name: GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v2.0.0
-          name: v2.0.0
+          tag_name: v${{ env.VERSION }}
+          name: v${{ env.VERSION }}
           generate_release_notes: true
