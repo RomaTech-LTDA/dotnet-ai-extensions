@@ -17,4 +17,11 @@ public sealed class McpToolDefinition
     [JsonPropertyName("inputSchema")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public object? InputSchema { get; init; }
+
+    /// <summary>
+    /// Tool annotations (hints): <c>readOnlyHint</c>, <c>destructiveHint</c>, <c>idempotentHint</c>, <c>openWorldHint</c>.
+    /// </summary>
+    [JsonPropertyName("annotations")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public object? Annotations { get; init; }
 }

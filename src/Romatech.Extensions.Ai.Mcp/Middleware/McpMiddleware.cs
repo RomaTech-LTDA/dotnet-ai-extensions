@@ -1,90 +1,38 @@
-using System.Text.Json;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Romatech.Extensions.Ai.Mcp.Configuration;
-using Romatech.Extensions.Ai.Mcp.Protocol;
-using Romatech.Extensions.Ai.Mcp.Services;
+using Romatech.Extensions.Ai.Mcp.Http;
 
 namespace Romatech.Extensions.Ai.Mcp.Middleware;
 
 /// <summary>
-/// ASP.NET Core middleware that handles MCP protocol requests.
+/// ASP.NET Core middleware that serves the MCP endpoint at <see cref="McpOptions.Route"/>.
+/// Prefer <c>app.MapMcp()</c> when you want to attach endpoint conventions
+/// (<c>RequireAuthorization</c>, <c>RequireCors</c>, <c>RequireRateLimiting</c>).
 /// </summary>
 public sealed class McpMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly McpRequestHandler _handler;
-    private readonly McpOptions _options;
-    private readonly ILogger<McpMiddleware> _logger;
+    private readonly McpHttpHandler _handler;
+    private readonly PathString _route;
 
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        PropertyNameCaseInsensitive = true
-    };
-
-    public McpMiddleware(
-        RequestDelegate next,
-        McpRequestHandler handler,
-        IOptions<McpOptions> options,
-        ILogger<McpMiddleware> logger)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="McpMiddleware"/> class.
+    /// </summary>
+    public McpMiddleware(RequestDelegate next, McpHttpHandler handler, IOptions<McpOptions> options)
     {
         _next = next;
         _handler = handler;
-        _options = options.Value;
-        _logger = logger;
+        _route = new PathString(options.Value.Route);
     }
 
-    public async Task InvokeAsync(HttpContext context)
+    /// <summary>
+    /// Serves MCP requests and passes everything else to the next middleware.
+    /// </summary>
+    public Task InvokeAsync(HttpContext context)
     {
-        if (!IsMatchingRoute(context))
-        {
-            await _next(context);
-            return;
-        }
-
-        if (context.Request.Method != "POST")
-        {
-            context.Response.StatusCode = 405;
-            return;
-        }
-
-        // Ensure registry is initialized on first MCP request
-        var registry = context.RequestServices.GetRequiredService<McpToolRegistry>();
-        await registry.InitializeAsync(context.RequestAborted);
-
-        McpRequest? request;
-        try
-        {
-            request = await JsonSerializer.DeserializeAsync<McpRequest>(
-                context.Request.Body, JsonOptions, context.RequestAborted);
-        }
-        catch (JsonException ex)
-        {
-            _logger.LogWarning(ex, "Invalid MCP request JSON");
-            context.Response.StatusCode = 400;
-            await context.Response.WriteAsJsonAsync(
-                McpResponse.Failure(null, -32700, "Parse error"), JsonOptions);
-            return;
-        }
-
-        if (request is null)
-        {
-            context.Response.StatusCode = 400;
-            await context.Response.WriteAsJsonAsync(
-                McpResponse.Failure(null, -32600, "Invalid request"), JsonOptions);
-            return;
-        }
-
-        var response = await _handler.HandleAsync(request, context.RequestAborted);
-        context.Response.ContentType = "application/json";
-        await context.Response.WriteAsJsonAsync(response, JsonOptions);
-    }
-
-    private bool IsMatchingRoute(HttpContext context)
-    {
-        return context.Request.Path.Equals(_options.Route, StringComparison.OrdinalIgnoreCase);
+        return context.Request.Path.Equals(_route, StringComparison.OrdinalIgnoreCase)
+            ? _handler.HandleAsync(context)
+            : _next(context);
     }
 }

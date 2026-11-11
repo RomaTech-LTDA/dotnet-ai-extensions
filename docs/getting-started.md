@@ -2,8 +2,8 @@
 
 ## Prerequisites
 
-- .NET 8.0 or .NET 9.0
-- An ASP.NET Core application with Swagger/OpenAPI enabled
+- .NET 6.0 to .NET 10.0
+- An ASP.NET Core application (an OpenAPI generator is optional)
 
 ## Installation
 
@@ -20,19 +20,22 @@ builder.Services.UseMcp();
 builder.Services.UseRag();
 ```
 
-And add the middleware:
+And map the endpoint:
 
 ```csharp
-app.UseMcp();
+app.MapMcp(); // or app.UseMcp()
 ```
+
+The MCP endpoint requires an authenticated caller by default: the MCP client sends the same cookie or bearer token
+your API already accepts, and every tool runs as that user.
 
 ## Verifying Installation
 
 1. Start your application
-2. Send a POST to `/mcp`:
+2. Send an authenticated POST to `/mcp` with `Content-Type: application/json`:
 
 ```json
-{ "jsonrpc": "2.0", "id": 1, "method": "initialize" }
+{ "jsonrpc": "2.0", "id": 1, "method": "initialize", "params": { "protocolVersion": "2025-06-18" } }
 ```
 
 3. You should receive the MCP server capabilities response.

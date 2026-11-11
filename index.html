@@ -64,16 +64,18 @@
             <pre><code>var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddSwaggerGen();
+builder.Services.AddAuthentication(/* cookie, JWT, ... */);
+builder.Services.AddAuthorization();
 
-// One line to enable MCP + RAG
+// Enable MCP + RAG
 builder.Services.UseMcp();
 builder.Services.UseRag();
 
 var app = builder.Build();
-app.UseSwagger();
-app.UseMcp();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
+app.MapMcp();
 app.Run();</code></pre>
             <p style="margin-top: 0.75rem; color: #555;">That's it. Your APIs are now AI-consumable.</p>
         </section>
@@ -94,20 +96,20 @@ app.Run();</code></pre>
                     <p>Automatic semantic search over your API documentation via <code>rag_search</code> tool.</p>
                 </div>
                 <div class="feature-card">
-                    <h3>Swagger Discovery</h3>
-                    <p>Auto-discovers endpoints from your existing OpenAPI/Swagger configuration.</p>
+                    <h3>In-process Discovery</h3>
+                    <p>Reads endpoints from ApiExplorer. Works with Swashbuckle, Microsoft.AspNetCore.OpenApi, NSwag, Scalar, or none.</p>
                 </div>
                 <div class="feature-card">
                     <h3>Security Built-in</h3>
-                    <p>Inherits ASP.NET Core auth. Role-based execution, per-tool rate limiting, JWT forwarding.</p>
+                    <p>Tools run as the caller under each endpoint's own authorization. Authenticated MCP endpoint, Origin validation, per-client rate limiting.</p>
                 </div>
                 <div class="feature-card">
                     <h3>Minimal API Support</h3>
                     <p>Works with controllers and Minimal APIs. Extension methods: <code>.AiTool()</code>, <code>.AiHidden()</code>.</p>
                 </div>
                 <div class="feature-card">
-                    <h3>.NET 8 &amp; 9</h3>
-                    <p>Supports .NET 8.0 and .NET 9.0. Modern ASP.NET Core pipeline integration.</p>
+                    <h3>.NET 6 to 10</h3>
+                    <p>Tested on .NET 6, 7, 8, 9 and 10. No NuGet dependencies beyond the ASP.NET Core shared framework.</p>
                 </div>
                 <div class="feature-card">
                     <h3>Zero Rewrites</h3>

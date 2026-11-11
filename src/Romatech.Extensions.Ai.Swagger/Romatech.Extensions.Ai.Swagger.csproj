@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <PackageId>Romatech.Extensions.Ai.Swagger</PackageId>
-    <Description>OpenAPI discovery and schema conversion for Romatech.Extensions.Ai</Description>
-    <PackageTags>ai;mcp;rag;aspnetcore;openapi</PackageTags>
+    <Description>In-process endpoint discovery (ApiExplorer + endpoint metadata) and JSON Schema generation for Romatech.Extensions.Ai. Works with any OpenAPI generator (Swashbuckle, Microsoft.AspNetCore.OpenApi, NSwag, Scalar) or none; never downloads the OpenAPI document.</Description>
+    <PackageTags>ai;mcp;rag;aspnetcore;openapi;apiexplorer;json-schema</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,15 +11,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.OpenApi.Readers" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
-    <PackageReference Include="Swashbuckle.AspNetCore" PrivateAssets="all" />
+    <ProjectReference Include="..\Romatech.Extensions.Ai.Shared\Romatech.Extensions.Ai.Shared.csproj" />
+    <ProjectReference Include="..\Romatech.Extensions.Ai.Metadata\Romatech.Extensions.Ai.Metadata.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Romatech.Extensions.Ai.Shared\Romatech.Extensions.Ai.Shared.csproj" />
-    <ProjectReference Include="..\Romatech.Extensions.Ai.Metadata\Romatech.Extensions.Ai.Metadata.csproj" />
+    <InternalsVisibleTo Include="Romatech.Extensions.Ai.Tests" />
   </ItemGroup>
 
 </Project>

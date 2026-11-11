@@ -2,19 +2,12 @@
 
   <PropertyGroup>
     <PackageId>Romatech.Extensions.Ai</PackageId>
-    <Description>Plug-and-play AI enablement framework for ASP.NET Core. Transforms APIs into MCP tools and RAG-enabled knowledge sources automatically.</Description>
+    <Description>Plug-and-play AI enablement for ASP.NET Core. Exposes your endpoints as MCP tools (executed in-process with the caller's identity and your authorization policies) and as a RAG-searchable catalog.</Description>
     <PackageTags>ai;mcp;rag;aspnetcore;openapi;llm;embeddings;tools</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
-    <PackageReference Include="Microsoft.Extensions.Options" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
   </ItemGroup>
 
   <ItemGroup>

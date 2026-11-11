@@ -31,9 +31,16 @@ public sealed class AiEndpointDescriptor
     public string? Category { get; init; }
 
     /// <summary>
-    /// Required role for executing this tool.
+    /// First required role for executing this tool (kept for compatibility).
+    /// Use <see cref="RequiredRoles"/> to see every requirement.
     /// </summary>
     public string? RequiredRole { get; init; }
+
+    /// <summary>
+    /// Role requirements from <c>[AiRole]</c>. Each entry must be satisfied (AND); an entry may list
+    /// alternatives separated by commas (OR), the same semantics as <c>[Authorize(Roles = "...")]</c>.
+    /// </summary>
+    public IReadOnlyList<string> RequiredRoles { get; init; } = Array.Empty<string>();
 
     /// <summary>
     /// Rate limit in requests per minute.

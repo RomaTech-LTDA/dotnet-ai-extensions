@@ -8,6 +8,7 @@ namespace Sample.Mvc.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Microsoft.AspNetCore.Authorization.Authorize]
 [AiCategory("Orders")]
 public class OrdersController : ControllerBase
 {
